@@ -3,6 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="About JSK Creation — a Pakistani supplier of kundan, meenakari, moti, beads, chains and findings for karigars, boutique makers and jewellery businesses.">
+<meta name="theme-color" content="#4A0D17">
 <title>About Us — JSK Creation | Jewellery Making Raw Materials, Pakistan</title>
 <link rel="icon" href="favicon.ico" sizes="any">
 <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
@@ -10,7 +12,9 @@
 <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
 <link rel="icon" type="image/png" sizes="192x192" href="favicon-192.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500&family=Mukta:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500&family=Mukta:wght@300;400;500;600;700&display=swap" onload="this.onload=null;this.rel='stylesheet'">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500&family=Mukta:wght@300;400;500;600;700&display=swap"></noscript>
 <style>
 /* ============ TOKENS ============ */
 :root{
@@ -22,6 +26,7 @@
   --maroon-soft:#8C2233;
   --gold:#B8842E;
   --gold-light:#E7C878;
+  --gold-text:#85591A;
   --gold-pale:#F3DFA9;
   --green:#2E4A3B;
   --green-deep:#1C2F26;
@@ -157,11 +162,11 @@ nav.main-nav{background:var(--paper);border-bottom:1px solid var(--line);}
 }
 .nav-item:hover .mega-panel, .nav-item:focus-within .mega-panel{display:grid;}
 .mega-panel-more{grid-template-columns:1fr;width:220px;padding:16px;}
-.mega-col h5{
+.mega-col .mega-title{
   font-family:'Mukta',sans-serif;font-size:12px;font-weight:700;letter-spacing:.08em;
   text-transform:uppercase;color:var(--maroon);margin-bottom:10px;display:flex;align-items:center;gap:6px;
 }
-.mega-col h5 .ic{width:15px;height:15px;color:var(--gold);flex:none;}
+.mega-col .mega-title .ic{width:15px;height:15px;color:var(--gold);flex:none;}
 .mega-col ul{list-style:none;margin:0;padding:0;}
 .mega-col li a{
   display:block;padding:5px 0;font-size:13.5px;color:var(--ink-soft);
@@ -381,7 +386,7 @@ section{padding:56px 0;}
 .quick-view-btn svg{width:13px;height:13px;}
 .card:hover .quick-view-btn{opacity:1;transform:translate(-50%,0);}
 .rating-row{display:flex;align-items:center;gap:6px;font-size:11.5px;color:var(--ink-soft);}
-.stars{display:flex;gap:1px;color:var(--gold);}
+.stars{display:flex;gap:1px;color:var(--gold-text);}
 .stars svg{width:12px;height:12px;}
 .card-name.clickable{cursor:pointer;transition:color 0.25s;transition-timing-function:var(--ease);}
 .card-name.clickable:hover{color:var(--maroon);}
@@ -515,7 +520,7 @@ footer{background:var(--maroon-deep);color:var(--gold-pale);margin-top:20px;}
 .footer-grid{
   display:grid;grid-template-columns:1.4fr 1fr 1fr;gap:32px;padding:56px 28px 30px;max-width:var(--maxw);margin:0 auto;
 }
-.footer-grid h5{color:var(--gold-light);font-family:'Mukta',sans-serif;font-size:12.5px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;margin-bottom:16px;}
+.footer-grid h3{color:var(--gold-light);font-family:'Mukta',sans-serif;font-size:12.5px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;margin-bottom:16px;}
 .footer-grid ul{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:9px;}
 .footer-grid ul a{font-size:13.5px;color:var(--gold-pale);opacity:.9;transition:opacity 0.25s;transition-timing-function:var(--ease);}
 .footer-grid ul a:hover{opacity:1;text-decoration:underline;}
@@ -546,7 +551,7 @@ footer{background:var(--maroon-deep);color:var(--gold-pale);margin-top:20px;}
   .wa-float{right:16px;bottom:16px;width:46px;height:46px;}
   .wa-float svg{width:22px;height:22px;}
 }
-.foot-admin-link{color:#8C7A56;opacity:.7;transition:opacity .25s ease;}
+.foot-admin-link{color:#CBAF7E;opacity:1;transition:opacity .25s ease;}
 .foot-admin-link:hover{opacity:1;color:#CBAF7E;}
 
 /* ============ CART DRAWER ============ */
@@ -645,11 +650,11 @@ footer{background:var(--maroon-deep);color:var(--gold-pale);margin-top:20px;}
 .cat-group{
   background:var(--white);border:1px solid var(--line);border-radius:14px;padding:20px 22px;
 }
-.cat-group h5{
+.cat-group .mega-title{
   font-family:'Mukta',sans-serif;font-size:13px;font-weight:700;letter-spacing:.06em;
   text-transform:uppercase;color:var(--maroon-deep);margin-bottom:14px;display:flex;align-items:center;gap:7px;
 }
-.cat-group h5 .ic{width:16px;height:16px;color:var(--gold);flex:none;}
+.cat-group .mega-title .ic{width:16px;height:16px;color:var(--gold);flex:none;}
 /* chips size themselves to their own text — no stretched / equal-width cells */
 .cat-group-chips{display:flex;flex-wrap:wrap;gap:10px;}
 .cat-chip{
@@ -675,7 +680,7 @@ footer{background:var(--maroon-deep);color:var(--gold-pale);margin-top:20px;}
 .pdp-info{padding:36px 0 24px 36px;border-left:1px solid var(--line);}
 .pdp-breadcrumb{font-size:12px;color:var(--ink-soft);margin-bottom:14px;}
 .pdp-breadcrumb a{color:var(--maroon);}
-.pdp-cat{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--gold);font-weight:700;}
+.pdp-cat{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--gold-text);font-weight:700;}
 .pdp-info h2{font-size:34px;font-style:italic;margin:6px 0 10px;line-height:1.15;}
 .pdp-rating{margin-bottom:12px;}
 .pdp-price{font-size:25px;font-weight:700;color:var(--maroon-deep);margin:6px 0 16px;}
@@ -771,16 +776,16 @@ footer{background:var(--maroon-deep);color:var(--gold-pale);margin-top:20px;}
     background:var(--paper);border:1px solid var(--line);border-radius:12px;
     overflow:hidden;margin:0 !important;padding:0;box-shadow:0 2px 8px rgba(74,13,23,.06);
   }
-  .mega-panel .mega-col h5{
+  .mega-panel .mega-col .mega-title{
     justify-content:space-between;margin:0;padding:14px 14px;font-size:12.5px;
     background:var(--ivory-deep);color:var(--maroon-deep);cursor:pointer;user-select:none;
   }
-  .mega-panel .mega-col h5::after{
+  .mega-panel .mega-col .mega-title::after{
     content:"";width:7px;height:7px;border-right:2px solid var(--maroon);border-bottom:2px solid var(--maroon);
     transform:rotate(45deg);transition:transform 0.35s ease;transition-timing-function:var(--ease);flex:none;margin-left:auto;
   }
-  .mega-panel .mega-col.cat-open h5{background:var(--gold-pale);}
-  .mega-panel .mega-col.cat-open h5::after{transform:rotate(-135deg);}
+  .mega-panel .mega-col.cat-open .mega-title{background:var(--gold-pale);}
+  .mega-panel .mega-col.cat-open .mega-title::after{transform:rotate(-135deg);}
   .mega-panel .mega-col ul{
     display:none;flex-wrap:wrap;gap:8px;padding:14px;background:var(--paper);
   }
@@ -886,7 +891,7 @@ footer{background:var(--maroon-deep);color:var(--gold-pale);margin-top:20px;}
   background:var(--paper);border:1px solid var(--line);border-radius:var(--radius);
   padding:22px 20px;box-shadow:var(--shadow);
 }
-.about-values .val-card h4{
+.about-values .val-card h3{
   font-family:'Mukta',sans-serif;font-size:14px;font-weight:700;color:var(--maroon-deep);
   margin:0 0 8px;letter-spacing:.02em;
 }
@@ -899,7 +904,7 @@ footer{background:var(--maroon-deep);color:var(--gold-pale);margin-top:20px;}
 .about-cta h3{font-family:'Cormorant Garamond',serif;color:#fff;font-size:24px;margin:0 0 10px;}
 .about-cta p{font-size:14px;color:var(--gold-pale);margin:0 0 20px;}
 .about-cta a{
-  display:inline-block;background:var(--gold);color:#fff;font-family:'Mukta',sans-serif;
+  display:inline-block;background:var(--gold);color:var(--maroon-deep);font-family:'Mukta',sans-serif;
   font-weight:700;font-size:13px;letter-spacing:.04em;padding:12px 26px;border-radius:999px;
   text-decoration:none;
 }
@@ -921,7 +926,7 @@ footer{background:var(--maroon-deep);color:var(--gold-pale);margin-top:20px;}
         <span class="hbg"><span></span><span></span><span></span></span>
       </button>
     </div>
-    <a href="index.html#top" class="logo"><img src="logo-mark.png" alt="JSK Creation" class="logo-mark"></a>
+    <a href="index.html#top" class="logo"><img src="logo-mark.png" alt="JSK Creation" class="logo-mark" width="60" height="52"></a>
     <div class="header-actions">
       <button class="icon-btn" id="cartToggle" aria-label="Open cart" onclick="window.location.href='index.html'">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
@@ -942,6 +947,7 @@ footer{background:var(--maroon-deep);color:var(--gold-pale);margin-top:20px;}
   </nav>
 </header>
 
+<main id="main">
 <!-- ============ ABOUT HERO ============ -->
 <section class="about-hero">
   <p class="eyebrow">Our Story</p>
@@ -965,15 +971,15 @@ footer{background:var(--maroon-deep);color:var(--gold-pale);margin-top:20px;}
 
   <div class="about-values">
     <div class="val-card">
-      <h4>Quality Material</h4>
+      <h3>Quality Material</h3>
       <p>Carefully sourced Kundan, Meenakari, stones and findings, chosen for consistency batch after batch.</p>
     </div>
     <div class="val-card">
-      <h4>Fast Dispatch</h4>
+      <h3>Fast Dispatch</h3>
       <p>Stocked inventory and quick turnaround, especially during festival and wedding-season rushes.</p>
     </div>
     <div class="val-card">
-      <h4>Wholesale &amp; Retail</h4>
+      <h3>Wholesale &amp; Retail</h3>
       <p>Fair pricing for bulk buyers and karigars, without shutting the door on smaller, one-off orders.</p>
     </div>
   </div>
@@ -991,15 +997,17 @@ footer{background:var(--maroon-deep);color:var(--gold-pale);margin-top:20px;}
 
 </section>
 
+</main>
+
 <!-- ============ FOOTER ============ -->
 <footer id="contact">
   <div class="footer-grid">
     <div class="footer-brand">
-      <a href="index.html#top" class="logo footer-logo"><img src="logo-mark.png" alt="JSK Creation" class="logo-mark"></a>
+      <a href="index.html#top" class="logo footer-logo"><img src="logo-mark.png" alt="JSK Creation" class="logo-mark" width="60" height="52"></a>
       <p>Wholesale and retail jewellery making materials — beads, chains, findings, stones, wire and tools.</p>
     </div>
     <div class="footer-contact">
-      <h5>Contact</h5>
+      <h3>Contact</h3>
       <p>WhatsApp: +92 305 2181963</p>
       <p>orders@jskcreation.com</p>
       <div class="footer-social">
@@ -1010,7 +1018,7 @@ footer{background:var(--maroon-deep);color:var(--gold-pale);margin-top:20px;}
       </div>
     </div>
     <div class="footer-hours">
-      <h5>Hours</h5>
+      <h3>Hours</h3>
       <p>Mon–Sat: 10:00 – 19:00</p>
       <p>Sunday: Closed</p>
     </div>

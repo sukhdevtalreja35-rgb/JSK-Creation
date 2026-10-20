@@ -3,14 +3,19 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="JSK Creation — Pakistan's online store for jewellery making raw materials: kundan, meenakari, moti (pearls), beads, chains, findings, wire and tools. Nationwide shipping.">
+<meta name="theme-color" content="#4A0D17">
 <title>JSK Creation — Jewellery Making Raw Materials, Pakistan</title>
 <link rel="icon" href="favicon.ico" sizes="any">
+<link rel="preload" as="image" href="banner-raw-materials.webp" type="image/webp" fetchpriority="high">
 <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
 <link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
 <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
 <link rel="icon" type="image/png" sizes="192x192" href="favicon-192.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500&family=Mukta:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500&family=Mukta:wght@300;400;500;600;700&display=swap" onload="this.onload=null;this.rel='stylesheet'">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500&family=Mukta:wght@300;400;500;600;700&display=swap"></noscript>
 <style>
 /* ============ TOKENS ============ */
 :root{
@@ -22,6 +27,7 @@
   --maroon-soft:#8C2233;
   --gold:#B8842E;
   --gold-light:#E7C878;
+  --gold-text:#85591A;
   --gold-pale:#F3DFA9;
   --green:#2E4A3B;
   --green-deep:#1C2F26;
@@ -46,7 +52,7 @@ body{
   font-weight:400;
   -webkit-font-smoothing:antialiased;
 }
-h1,h2,h3,h4{
+h1,h2,h3,h4,h5,h6{
   font-family:'Cormorant Garamond',serif;
   font-weight:600;
   color:var(--maroon-deep);
@@ -157,11 +163,11 @@ nav.main-nav{background:var(--paper);border-bottom:1px solid var(--line);}
 }
 .nav-item:hover .mega-panel, .nav-item:focus-within .mega-panel{display:grid;}
 .mega-panel-more{grid-template-columns:1fr;width:220px;padding:16px;}
-.mega-col h5{
+.mega-col .mega-title{
   font-family:'Mukta',sans-serif;font-size:12px;font-weight:700;letter-spacing:.08em;
   text-transform:uppercase;color:var(--maroon);margin-bottom:10px;display:flex;align-items:center;gap:6px;
 }
-.mega-col h5 .ic{width:15px;height:15px;color:var(--gold);flex:none;}
+.mega-col .mega-title .ic{width:15px;height:15px;color:var(--gold);flex:none;}
 .mega-col ul{list-style:none;margin:0;padding:0;}
 .mega-col li a{
   display:block;padding:5px 0;font-size:13.5px;color:var(--ink-soft);
@@ -225,17 +231,17 @@ nav.main-nav{background:var(--paper);border-bottom:1px solid var(--line);}
 }
 .promo-content{position:relative;z-index:3;max-width:640px;padding:0 6vw;}
 .promo-eyebrow{
-  display:inline-flex;align-items:center;gap:12px;color:var(--gold-pale);
+  display:inline-flex;align-items:center;gap:12px;color:var(--gold-pale);text-shadow:0 1px 8px rgba(0,0,0,.55);
   font-size:12px;font-weight:600;letter-spacing:.28em;text-transform:uppercase;margin-bottom:20px;
 }
 .promo-eyebrow::before{content:"";width:28px;height:1px;background:var(--gold-light);display:inline-block;}
-.promo-content h1{
+.promo-content .slide-title{
   font-family:'Cormorant Garamond',serif;font-weight:500;text-transform:uppercase;letter-spacing:.02em;
   font-size:clamp(30px,4.6vw,56px);line-height:1.12;color:#fff;margin-bottom:20px;
   text-shadow:0 4px 24px rgba(0,0,0,.25);
 }
-.promo-content h1 span{color:var(--gold-light);}
-.promo-content p{font-size:15px;font-weight:300;line-height:1.8;color:rgba(255,255,255,.78);max-width:420px;margin-bottom:30px;letter-spacing:.01em;}
+.promo-content .slide-title span{color:var(--gold-light);}
+.promo-content p{font-size:15px;font-weight:400;line-height:1.8;color:rgba(255,255,255,.94);max-width:420px;margin-bottom:30px;letter-spacing:.01em;}
 .promo-cta{
   position:absolute;right:32px;bottom:32px;z-index:5;
   display:inline-flex;align-items:center;gap:10px;color:#fff;background:none;border:none;
@@ -260,8 +266,12 @@ nav.main-nav{background:var(--paper);border-bottom:1px solid var(--line);}
 .slide-arrow.prev{left:20px;}
 .slide-arrow.next{right:20px;}
 .slide-dots{position:absolute;bottom:24px;left:50%;transform:translateX(-50%);display:flex;gap:10px;z-index:6;}
-.slide-dot{width:20px;height:1.5px;border-radius:0;border:none;background:rgba(255,255,255,.38);cursor:pointer;transition:all 0.45s;transition-timing-function:var(--ease);padding:0;}
-.slide-dot.active{background:var(--gold-light);width:34px;}
+.slide-dot{position:relative;width:34px;height:14px;border:none;background:none;cursor:pointer;padding:0;}
+.slide-dot::before,.slide-dot::after{content:"";position:absolute;left:0;top:6px;width:100%;height:1.5px;transform-origin:left center;transition:transform 0.45s var(--ease), opacity 0.45s var(--ease);}
+.slide-dot::before{background:rgba(255,255,255,.55);transform:scaleX(.59);}
+.slide-dot::after{background:var(--gold-light);opacity:0;transform:scaleX(.59);}
+.slide-dot.active::before{transform:scaleX(1);}
+.slide-dot.active::after{opacity:1;transform:scaleX(1);}
 .breadcrumb-row{padding:14px 0;font-size:13px;color:var(--ink-soft);border-bottom:1px solid var(--line);}
 .breadcrumb-row .wrap{padding:0 28px;}
 .breadcrumb-row a{color:var(--maroon);font-weight:600;}
@@ -275,7 +285,7 @@ nav.main-nav{background:var(--paper);border-bottom:1px solid var(--line);}
   .hero-slider{height:320px;}
   .promo-banner{flex-direction:column;align-items:stretch;justify-content:flex-end;padding-bottom:22px;}
   .promo-content{padding:0 20px;max-width:100%;width:100%;position:relative;}
-  .promo-content h1{font-size:clamp(22px,7.2vw,30px);margin-bottom:8px;text-shadow:0 3px 14px rgba(0,0,0,.65),0 1px 3px rgba(0,0,0,.5);}
+  .promo-content .slide-title{font-size:clamp(22px,7.2vw,30px);margin-bottom:8px;text-shadow:0 3px 14px rgba(0,0,0,.65),0 1px 3px rgba(0,0,0,.5);}
   .promo-content p{display:none;}
   .promo-eyebrow{margin-bottom:8px;font-size:10px;letter-spacing:.22em;gap:9px;text-shadow:0 2px 10px rgba(0,0,0,.7);}
   .promo-eyebrow::before{width:18px;}
@@ -418,7 +428,7 @@ section{padding:56px 0;}
 .quick-view-btn svg{width:13px;height:13px;}
 .card:hover .quick-view-btn{opacity:1;transform:translate(-50%,0);}
 .rating-row{display:flex;align-items:center;gap:6px;font-size:11.5px;color:var(--ink-soft);}
-.stars{display:flex;gap:1px;color:var(--gold);}
+.stars{display:flex;gap:1px;color:var(--gold-text);}
 .stars svg{width:12px;height:12px;}
 .card-name.clickable{cursor:pointer;transition:color 0.25s;transition-timing-function:var(--ease);}
 .card-name.clickable:hover{color:var(--maroon);}
@@ -553,7 +563,7 @@ footer{background:var(--maroon-deep);color:var(--gold-pale);margin-top:20px;}
 .footer-grid{
   display:grid;grid-template-columns:1.4fr 1fr 1fr;gap:32px;padding:56px 28px 30px;max-width:var(--maxw);margin:0 auto;
 }
-.footer-grid h5{color:var(--gold-light);font-family:'Mukta',sans-serif;font-size:12.5px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;margin-bottom:16px;}
+.footer-grid h3{color:var(--gold-light);font-family:'Mukta',sans-serif;font-size:12.5px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;margin-bottom:16px;}
 .footer-grid ul{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:9px;}
 .footer-grid ul a{font-size:13.5px;color:var(--gold-pale);opacity:.9;transition:opacity 0.25s;transition-timing-function:var(--ease);}
 .footer-grid ul a:hover{opacity:1;text-decoration:underline;}
@@ -584,7 +594,7 @@ footer{background:var(--maroon-deep);color:var(--gold-pale);margin-top:20px;}
   .wa-float{right:16px;bottom:16px;width:46px;height:46px;}
   .wa-float svg{width:22px;height:22px;}
 }
-.foot-admin-link{color:#8C7A56;opacity:.7;transition:opacity .25s ease;}
+.foot-admin-link{color:#CBAF7E;opacity:1;transition:opacity .25s ease;}
 .foot-admin-link:hover{opacity:1;color:#CBAF7E;}
 
 /* ============ CART DRAWER ============ */
@@ -606,7 +616,7 @@ footer{background:var(--maroon-deep);color:var(--gold-pale);margin-top:20px;}
 .cart-line{display:flex;gap:12px;padding-bottom:14px;border-bottom:1px dashed var(--line);}
 .cart-line .thumb{width:64px;height:64px;border-radius:10px;flex:none;}
 .cart-line .info{flex:1;}
-.cart-line .info h6{font-family:'Cormorant Garamond',serif;font-size:16px;color:var(--maroon-deep);font-weight:600;}
+.cart-line .info .line-name{font-family:'Cormorant Garamond',serif;font-size:16px;color:var(--maroon-deep);font-weight:600;}
 .cart-line .info .meta{font-size:11.5px;color:var(--ink-soft);margin:3px 0 8px;}
 .qty-ctrl{display:flex;align-items:center;gap:10px;}
 .qty-ctrl button{width:24px;height:24px;border-radius:50%;border:1px solid var(--line);background:var(--ivory);font-weight:700;display:flex;align-items:center;justify-content:center;font-size:14px;color:var(--maroon);}
@@ -639,7 +649,7 @@ footer{background:var(--maroon-deep);color:var(--gold-pale);margin-top:20px;}
 .checkout-line{display:flex;gap:10px;align-items:center;}
 .checkout-line .thumb{width:48px;height:48px;border-radius:8px;flex:none;}
 .checkout-line .info{flex:1;font-size:12.5px;}
-.checkout-line .info h6{font-family:'Cormorant Garamond',serif;font-size:14.5px;color:var(--maroon-deep);font-weight:600;}
+.checkout-line .info .line-name{font-family:'Cormorant Garamond',serif;font-size:14.5px;color:var(--maroon-deep);font-weight:600;}
 .checkout-line .info .meta{color:var(--ink-soft);font-size:11px;}
 .checkout-line .price{font-size:12.5px;font-weight:700;white-space:nowrap;}
 @media (max-width:860px){
@@ -683,11 +693,11 @@ footer{background:var(--maroon-deep);color:var(--gold-pale);margin-top:20px;}
 .cat-group{
   background:var(--white);border:1px solid var(--line);border-radius:14px;padding:20px 22px;
 }
-.cat-group h5{
+.cat-group .mega-title{
   font-family:'Mukta',sans-serif;font-size:13px;font-weight:700;letter-spacing:.06em;
   text-transform:uppercase;color:var(--maroon-deep);margin-bottom:14px;display:flex;align-items:center;gap:7px;
 }
-.cat-group h5 .ic{width:16px;height:16px;color:var(--gold);flex:none;}
+.cat-group .mega-title .ic{width:16px;height:16px;color:var(--gold);flex:none;}
 /* chips size themselves to their own text — no stretched / equal-width cells */
 .cat-group-chips{display:flex;flex-wrap:wrap;gap:10px;}
 .cat-chip{
@@ -713,7 +723,7 @@ footer{background:var(--maroon-deep);color:var(--gold-pale);margin-top:20px;}
 .pdp-info{padding:36px 0 24px 36px;border-left:1px solid var(--line);}
 .pdp-breadcrumb{font-size:12px;color:var(--ink-soft);margin-bottom:14px;}
 .pdp-breadcrumb a{color:var(--maroon);}
-.pdp-cat{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--gold);font-weight:700;}
+.pdp-cat{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--gold-text);font-weight:700;}
 .pdp-info h2{font-size:34px;font-style:italic;margin:6px 0 10px;line-height:1.15;}
 .pdp-rating{margin-bottom:12px;}
 .pdp-price{font-size:25px;font-weight:700;color:var(--maroon-deep);margin:6px 0 16px;}
@@ -737,7 +747,7 @@ footer{background:var(--maroon-deep);color:var(--gold-pale);margin-top:20px;}
 .pdp-meta-list{list-style:none;margin:20px 0 0;padding:18px 0 0;border-top:1px dashed var(--line);display:flex;flex-direction:column;gap:9px;font-size:13px;color:var(--ink-soft);}
 .pdp-meta-list li strong{color:var(--ink);}
 .related-section{padding:36px 28px 60px;max-width:var(--maxw);margin:0 auto;}
-.related-section h4{font-size:22px;font-style:italic;margin-bottom:16px;color:var(--maroon-deep);}
+.related-section h3{font-size:22px;font-style:italic;margin-bottom:16px;color:var(--maroon-deep);}
 .related-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:18px;}
 @media (max-width:760px){
   .pdp-body{grid-template-columns:1fr;padding:0 20px;}
@@ -809,16 +819,16 @@ footer{background:var(--maroon-deep);color:var(--gold-pale);margin-top:20px;}
     background:var(--paper);border:1px solid var(--line);border-radius:12px;
     overflow:hidden;margin:0 !important;padding:0;box-shadow:0 2px 8px rgba(74,13,23,.06);
   }
-  .mega-panel .mega-col h5{
+  .mega-panel .mega-col .mega-title{
     justify-content:space-between;margin:0;padding:14px 14px;font-size:12.5px;
     background:var(--ivory-deep);color:var(--maroon-deep);cursor:pointer;user-select:none;
   }
-  .mega-panel .mega-col h5::after{
+  .mega-panel .mega-col .mega-title::after{
     content:"";width:7px;height:7px;border-right:2px solid var(--maroon);border-bottom:2px solid var(--maroon);
     transform:rotate(45deg);transition:transform 0.35s ease;transition-timing-function:var(--ease);flex:none;margin-left:auto;
   }
-  .mega-panel .mega-col.cat-open h5{background:var(--gold-pale);}
-  .mega-panel .mega-col.cat-open h5::after{transform:rotate(-135deg);}
+  .mega-panel .mega-col.cat-open .mega-title{background:var(--gold-pale);}
+  .mega-panel .mega-col.cat-open .mega-title::after{transform:rotate(-135deg);}
   .mega-panel .mega-col ul{
     display:none;flex-wrap:wrap;gap:8px;padding:14px;background:var(--paper);
   }
@@ -907,7 +917,7 @@ footer{background:var(--maroon-deep);color:var(--gold-pale);margin-top:20px;}
         <span class="hbg"><span></span><span></span><span></span></span>
       </button>
     </div>
-    <a href="#top" class="logo"><img src="logo-mark.png" alt="JSK Creation" class="logo-mark"></a>
+    <a href="#top" class="logo"><img src="logo-mark.png" alt="JSK Creation" class="logo-mark" width="60" height="52"></a>
     <div class="header-actions">
       <div class="search-box" id="searchBox">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
@@ -955,6 +965,7 @@ footer{background:var(--maroon-deep);color:var(--gold-pale);margin-top:20px;}
   </nav>
 </header>
 
+<main id="main">
 <!-- ============ HERO / PROMO BANNER ============ -->
 <section class="hero" id="top">
   <div class="hero-split">
@@ -963,12 +974,12 @@ footer{background:var(--maroon-deep);color:var(--gold-pale);margin-top:20px;}
 
       <div class="hero-slide active" data-slide="0">
         <div class="slide-art promo-banner promo-5">
-          <img class="promo-photo" src="banner-raw-materials.jpg" alt="Kundan, meenakari and pearl jewellery raw materials laid out" loading="eager">
+          <img class="promo-photo" src="banner-raw-materials.webp" width="1390" height="311" alt="Kundan, meenakari and pearl jewellery raw materials laid out" fetchpriority="high" decoding="async">
           <div class="promo-scrim"></div>
           <div class="promo-frame"></div>
           <div class="promo-content">
             <p class="promo-eyebrow">Raw Materials for Handmade Tradition</p>
-            <h1>Kundan, Moti<br><span>&amp; Raw Material</span></h1>
+            <h1 class="slide-title">Kundan, Moti<br><span>&amp; Raw Material</span></h1>
             <p>From kundan settings and meenakari hexagons to pearl drops, gota and jadau stones — everything a karigar needs, sourced and ready to craft.</p>
           </div>
           <a href="#all-products" class="promo-cta">Discover the Collection<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
@@ -977,12 +988,12 @@ footer{background:var(--maroon-deep);color:var(--gold-pale);margin-top:20px;}
 
       <div class="hero-slide" data-slide="1">
         <div class="slide-art promo-banner promo-6">
-          <img class="promo-photo" src="banner-kundan-meenakari.jpg" alt="Loose kundan and meenakari stone components" loading="lazy">
+          <img class="promo-photo" src="banner-kundan-meenakari.webp" width="1536" height="345" alt="Loose kundan and meenakari stone components" loading="lazy" decoding="async">
           <div class="promo-scrim"></div>
           <div class="promo-frame"></div>
           <div class="promo-content">
             <p class="promo-eyebrow">Kundan &amp; Meenakari Edit</p>
-            <h1>Loose Kundan<br><span>&amp; Meenakari Stones</span></h1>
+            <h2 class="slide-title">Loose Kundan<br><span>&amp; Meenakari Stones</span></h2>
             <p>Hand-set kundan pieces and hexagonal meenakari beads in classic white and jewel tones — sold by the piece for necklaces, jhumkas and bridal sets.</p>
           </div>
           <a href="#all-products" class="promo-cta">Discover the Collection<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
@@ -991,12 +1002,12 @@ footer{background:var(--maroon-deep);color:var(--gold-pale);margin-top:20px;}
 
       <div class="hero-slide" data-slide="2">
         <div class="slide-art promo-banner promo-7">
-          <img class="promo-photo" src="banner-earring-sets.jpg" alt="Finished kundan and meenakari earring sets with pearl drops" loading="lazy">
+          <img class="promo-photo" src="banner-earring-sets.webp" width="1536" height="334" alt="Finished kundan and meenakari earring sets with pearl drops" loading="lazy" decoding="async">
           <div class="promo-scrim"></div>
           <div class="promo-frame"></div>
           <div class="promo-content">
             <p class="promo-eyebrow">Handcrafted Kundan Collection</p>
-            <h1>Kundan &amp; Meenakari<br><span>Earring Sets</span></h1>
+            <h2 class="slide-title">Kundan &amp; Meenakari<br><span>Earring Sets</span></h2>
             <p>Lotus-cut kundan and emerald-green meenakari, finished with pearl drops — ready-made sets for retail or your own bridal line.</p>
           </div>
           <a href="#all-products" class="promo-cta">Discover the Collection<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
@@ -1030,7 +1041,7 @@ footer{background:var(--maroon-deep);color:var(--gold-pale);margin-top:20px;}
       </div>
       <a href="#categories" class="link-more" id="viewAllCategoriesLink">View All Categories →</a>
     </div>
-    <div class="trending-scroll" id="trendingScroll"></div>
+    <div class="trending-scroll" id="trendingScroll" role="region" aria-label="Trending products" tabindex="0"></div>
   </div>
 </section>
 
@@ -1039,7 +1050,7 @@ footer{background:var(--maroon-deep);color:var(--gold-pale);margin-top:20px;}
   <div class="wrap">
     <div class="banner-inner">
       <div>
-        <p class="eyebrow" style="color:var(--gold-light)">Reserve In Advance</p>
+        <p class="eyebrow">Reserve In Advance</p>
         <h2>Pre-Booking Collection</h2>
         <p>New stock on its way — pre-book now and it ships to you in 2–4 weeks, no waiting around for a restock.</p>
         <a href="#all-products" class="btn btn-gold" style="margin-top:18px;">Shop Pre-Booking →</a>
@@ -1139,15 +1150,17 @@ footer{background:var(--maroon-deep);color:var(--gold-pale);margin-top:20px;}
   </div>
 </section>
 
+</main>
+
 <!-- ============ FOOTER ============ -->
 <footer id="contact">
   <div class="footer-grid">
     <div class="footer-brand">
-      <a href="#top" class="logo footer-logo"><img src="logo-mark.png" alt="JSK Creation" class="logo-mark"></a>
+      <a href="#top" class="logo footer-logo"><img src="logo-mark.png" alt="JSK Creation" class="logo-mark" width="60" height="52"></a>
       <p>Wholesale and retail jewellery making materials — beads, chains, findings, stones, wire and tools.</p>
     </div>
     <div class="footer-contact">
-      <h5>Contact</h5>
+      <h3>Contact</h3>
       <p>WhatsApp: +92 305 2181963</p>
       <p>orders@jskcreation.com</p>
       <div class="footer-social">
@@ -1158,7 +1171,7 @@ footer{background:var(--maroon-deep);color:var(--gold-pale);margin-top:20px;}
       </div>
     </div>
     <div class="footer-hours">
-      <h5>Hours</h5>
+      <h3>Hours</h3>
       <p>Mon–Sat: 10:00 – 19:00</p>
       <p>Sunday: Closed</p>
     </div>
@@ -1199,10 +1212,10 @@ footer{background:var(--maroon-deep);color:var(--gold-pale);margin-top:20px;}
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg>
       Back to Cart
     </button>
-    <div class="logo"><img src="logo-mark.png" alt="JSK Creation" class="logo-mark"></div>
+    <div class="logo"><img src="logo-mark.png" alt="JSK Creation" class="logo-mark" width="60" height="52"></div>
   </div>
   <div class="checkout-card">
-    <h1 class="checkout-title">Checkout</h1>
+    <h2 class="checkout-title">Checkout</h2>
     <div class="checkout-grid">
       <div class="checkout-form">
         <p id="checkoutError" style="display:none;color:#B3261E;font-size:12.5px;font-weight:600;margin-bottom:16px;">Please fill in all required fields.</p>
@@ -1245,7 +1258,7 @@ footer{background:var(--maroon-deep);color:var(--gold-pale);margin-top:20px;}
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg>
       Back to Shop
     </button>
-    <div class="logo"><img src="logo-mark.png" alt="JSK Creation" class="logo-mark"></div>
+    <div class="logo"><img src="logo-mark.png" alt="JSK Creation" class="logo-mark" width="60" height="52"></div>
   </div>
   <div class="pdp-card" id="pdpCard"></div>
 </div>
@@ -1257,11 +1270,11 @@ footer{background:var(--maroon-deep);color:var(--gold-pale);margin-top:20px;}
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg>
       Back
     </button>
-    <div class="logo"><img src="logo-mark.png" alt="JSK Creation" class="logo-mark"></div>
+    <div class="logo"><img src="logo-mark.png" alt="JSK Creation" class="logo-mark" width="60" height="52"></div>
   </div>
   <div class="categories-card">
     <p class="eyebrow">Browse the Full Range</p>
-    <h1 class="checkout-title">Shop By Category</h1>
+    <h2 class="checkout-title">Shop By Category</h2>
     <div class="categories-groups" id="categoriesGroups"></div>
   </div>
 </div>
@@ -1779,7 +1792,7 @@ function imgFor(p, idx){
 function artHtml(p, extraClass, idx){
   const src = imgFor(p,idx);
   const isPlaceholder = src === 'logo-mark.png';
-  return `<div class="product-art ${extraClass||''}" style="--base1:${p.base1};--base2:${p.base2};"><img class="${isPlaceholder?'product-art-loading-mark':''}" src="${src}" alt="${p.name}" loading="lazy" onerror="this.style.display='none'"></div>`;
+  return `<div class="product-art ${extraClass||''}" style="--base1:${p.base1};--base2:${p.base2};"><img class="${isPlaceholder?'product-art-loading-mark':''}" src="${src}" width="600" height="600" alt="${p.name}" loading="lazy" decoding="async" onerror="this.style.display='none'"></div>`;
 }
 
 
@@ -1810,7 +1823,7 @@ function renderMegaMenu(){
     }
     return `
     <div class="mega-col">
-      <h5>${ic(iconForCategoryIndex(idx),'ic')} ${group}</h5>
+      <div class="mega-title">${ic(iconForCategoryIndex(idx),'ic')} ${group}</div>
       <ul>${itemsHtml}</ul>
     </div>`;
   }).join('') + `<div class="mega-col mega-view-all"><a href="#categories" id="megaViewAllLink">View All Categories →</a></div>`;
@@ -1848,7 +1861,7 @@ function renderCategoriesPage(){
     }
     return `
     <div class="cat-group">
-      <h5>${ic(iconForCategoryIndex(idx),'ic')} ${group}</h5>
+      <div class="mega-title">${ic(iconForCategoryIndex(idx),'ic')} ${group}</div>
       <div class="cat-group-chips">${chipsHtml}</div>
     </div>`;
   }).join('');
@@ -1857,7 +1870,7 @@ renderCategoriesPage();
 
 /* mobile: tap a category header to expand/collapse just that group */
 megaPanel.addEventListener('click', (e)=>{
-  const h5 = e.target.closest('h5');
+  const h5 = e.target.closest('.mega-title');
   if(h5 && window.matchMedia('(max-width:720px)').matches){
     h5.parentElement.classList.toggle('cat-open');
   }
@@ -2243,7 +2256,7 @@ function renderCart(){
       <div class="cart-line" data-key="${line.key}">
         <div class="thumb product-art" data-art="${line.product.art}" style="--c1:${line.product.c1};--c2:${line.product.c2};--base1:${line.product.base1};--base2:${line.product.base2};"></div>
         <div class="info">
-          <h6>${line.product.name}</h6>
+          <p class="line-name" style="margin:0">${line.product.name}</p>
           <p class="meta">${line.variantLabel}</p>
           <div class="qty-ctrl">
             <button data-act="dec" data-key="${line.key}" aria-label="Decrease quantity">−</button>
@@ -2352,7 +2365,7 @@ function renderCheckoutSummary(){
     <div class="checkout-line">
       <div class="thumb product-art" data-art="${line.product.art}" style="--c1:${line.product.c1};--c2:${line.product.c2};--base1:${line.product.base1};--base2:${line.product.base2};"></div>
       <div class="info">
-        <h6>${line.product.name}</h6>
+        <p class="line-name" style="margin:0">${line.product.name}</p>
         <p class="meta">${line.variantLabel} &middot; Qty ${line.qty}</p>
       </div>
       <span class="price">${fmt(line.price*line.qty)}</span>
@@ -2552,7 +2565,7 @@ function renderPDP(){
   const related = PRODUCTS.filter(x=>x.group===p.group && x.id!==p.id).slice(0,4);
   const relatedHtml = related.length ? `
     <div class="related-section">
-      <h4>You May Also Like</h4>
+      <h3>You May Also Like</h3>
       <div class="related-grid">${related.map(renderCard).join('')}</div>
     </div>` : '';
 
@@ -2835,8 +2848,13 @@ startHeroTimer();
    INIT
    ============================================================ */
 renderAll();
-startCatalogSync();
-startCategorySync();
+function startSyncs(){ startCatalogSync(); startCategorySync(); }
+function startSyncsWhenIdle(){
+  if('requestIdleCallback' in window) requestIdleCallback(startSyncs, {timeout:2500});
+  else setTimeout(startSyncs, 400);
+}
+if(document.readyState === 'complete') startSyncsWhenIdle();
+else window.addEventListener('load', startSyncsWhenIdle, {once:true});
 </script>
 </body>
 </html>

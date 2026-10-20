@@ -65,7 +65,36 @@ window.firebaseReady = (async function () {
     }
   }
 
+  /* Keys whose cloud write failed. Until they succeed, the LOCAL copy is
+     newer than the cloud copy, so it must win on read - otherwise an old
+     cloud document silently overwrites fresh work on refresh. */
+  var PENDING_KEY = LS_PREFIX + "__pendingWrites";
+  function pendingMap() {
+    try {
+      return JSON.parse(window.localStorage.getItem(PENDING_KEY) || "{}") || {};
+    } catch (e) {
+      return {};
+    }
+  }
+  function markPending(key, isPending) {
+    try {
+      var m = pendingMap();
+      if (isPending) m[key] = 1;
+      else delete m[key];
+      window.localStorage.setItem(PENDING_KEY, JSON.stringify(m));
+    } catch (e) {
+      /* ignore */
+    }
+  }
+
   async function storeGet(key, fallback) {
+    if (pendingMap()[key]) {
+      var local = lsGet(key);
+      if (local !== undefined) {
+        console.warn("Using local copy of", key, "- cloud save is still pending.");
+        return local;
+      }
+    }
     try {
       if (window.storage) {
         var res = await window.storage.get(key, false);
@@ -92,9 +121,10 @@ window.firebaseReady = (async function () {
     if (ls !== undefined) return ls;
     return memoryFallback.hasOwnProperty(key) ? memoryFallback[key] : fallback;
   }
-  async function storeSet(key, value) {
+  async function storeSet(key, value, opts) {
+    opts = opts || {};
     memoryFallback[key] = value;
-    lsSet(key, value);
+    var localOk = opts.skipLocal ? true : lsSet(key, value);
     try {
       if (window.storage) {
         await window.storage.set(key, JSON.stringify(value), false);
@@ -102,15 +132,89 @@ window.firebaseReady = (async function () {
     } catch (e) {
       /* localStorage already has it as a safety net */
     }
+    var cloudOk = false;
+    var cloudErr = null;
     try {
       var fb = await window.firebaseReady;
       if (fb && fb.ok) {
         var ref = fb.doc(fb.db, FIRESTORE_COLLECTION, key);
         await fb.setDoc(ref, { value: value });
+        cloudOk = true;
       }
     } catch (e) {
+      cloudErr = e;
       console.warn("Firestore write failed for", key, e);
     }
+    markPending(key, !cloudOk);
+    return { ok: cloudOk, localOk: localOk, error: cloudErr };
+  }
+
+  /* ================= photo storage =================
+     Firestore caps ONE document at 1 MB. Photos are stored as base64
+     JPEG strings, so keeping them inside the single "items" document
+     meant 2-3 photographed items already blew past that cap. The write
+     was rejected, the old cloud copy survived, and on the next refresh
+     that old copy overwrote the good local one -> photos "disappeared".
+     Fix: each item's photos live in their own document, and the "items"
+     document only carries a hasPhoto flag. */
+  var IMG_PREFIX = "itemimg_";
+  var savedImagesCache = {};
+  function imgKey(id) {
+    return IMG_PREFIX + id;
+  }
+
+  /* A small banner so a failed cloud save is never silent again. */
+  function saveWarning(msg) {
+    var el = document.getElementById("saveWarningBar");
+    if (!el) {
+      el = document.createElement("div");
+      el.id = "saveWarningBar";
+      el.setAttribute(
+        "style",
+        "position:fixed;left:50%;transform:translateX(-50%);bottom:18px;z-index:99999;" +
+          "max-width:min(560px,92vw);background:#8A2A1F;color:#fff;padding:12px 16px;" +
+          "border-radius:10px;font:500 14px/1.45 system-ui,sans-serif;box-shadow:0 8px 28px rgba(0,0,0,.28);",
+      );
+      document.body.appendChild(el);
+    }
+    el.textContent = msg;
+    el.hidden = false;
+    clearTimeout(saveWarning._t);
+    saveWarning._t = setTimeout(function () {
+      if (el) el.hidden = true;
+    }, 7000);
+  }
+
+  /* Pull each item's photos out of its own document. */
+  async function hydrateItemImages(items) {
+    if (!Array.isArray(items)) return items;
+    await Promise.all(
+      items.map(async function (it) {
+        if (Array.isArray(it.images) && it.images.length) {
+          /* legacy item that still has photos inline - leave as is,
+             saveItems() below will migrate it out on the next save */
+          savedImagesCache[it.id] = "";
+          return;
+        }
+        if (it.hasPhoto === false) {
+          it.images = [];
+          it.img = "";
+          savedImagesCache[it.id] = JSON.stringify([]);
+          return;
+        }
+        var imgs = await storeGet(imgKey(it.id), null);
+        if (Array.isArray(imgs) && imgs.length) {
+          it.images = imgs;
+          it.img = imgs[0];
+          savedImagesCache[it.id] = JSON.stringify(imgs);
+        } else {
+          it.images = [];
+          it.img = "";
+          savedImagesCache[it.id] = JSON.stringify([]);
+        }
+      }),
+    );
+    return items;
   }
 
   /* ================= warehouse login gate =================
@@ -580,20 +684,45 @@ window.firebaseReady = (async function () {
           reject(new Error("Could not open that image."));
         };
         img.onload = function () {
-          var w = img.naturalWidth || img.width;
-          var h = img.naturalHeight || img.height;
-          var scale = Math.min(1, maxSide / Math.max(w, h));
-          w = Math.max(1, Math.round(w * scale));
-          h = Math.max(1, Math.round(h * scale));
-          var canvas = document.createElement("canvas");
-          canvas.width = w;
-          canvas.height = h;
-          var ctx = canvas.getContext("2d");
-          ctx.fillStyle = "#ffffff";
-          ctx.fillRect(0, 0, w, h);
-          ctx.drawImage(img, 0, 0, w, h);
+          var ow = img.naturalWidth || img.width;
+          var oh = img.naturalHeight || img.height;
+          /* Hard ceiling per photo. 4 photos x 200 KB stays comfortably
+             under Firestore's 1 MB per-document limit. */
+          var MAX_CHARS = 200 * 1024;
+          var steps = [
+            [maxSide, quality],
+            [Math.round(maxSide * 0.8), 0.62],
+            [Math.round(maxSide * 0.65), 0.52],
+            [Math.round(maxSide * 0.5), 0.45],
+          ];
+          function renderAt(side, q) {
+            var scale = Math.min(1, side / Math.max(ow, oh));
+            var w = Math.max(1, Math.round(ow * scale));
+            var h = Math.max(1, Math.round(oh * scale));
+            var canvas = document.createElement("canvas");
+            canvas.width = w;
+            canvas.height = h;
+            var ctx = canvas.getContext("2d");
+            ctx.fillStyle = "#ffffff";
+            ctx.fillRect(0, 0, w, h);
+            ctx.drawImage(img, 0, 0, w, h);
+            return canvas.toDataURL("image/jpeg", q);
+          }
           try {
-            resolve(canvas.toDataURL("image/jpeg", quality));
+            var out = "";
+            for (var i = 0; i < steps.length; i++) {
+              out = renderAt(steps[i][0], steps[i][1]);
+              if (out.length <= MAX_CHARS) break;
+            }
+            if (out.length > MAX_CHARS) {
+              reject(
+                new Error(
+                  "That photo stays too heavy even after compressing. Please crop it or use a smaller one.",
+                ),
+              );
+              return;
+            }
+            resolve(out);
           } catch (e) {
             reject(new Error("Could not process that image."));
           }
@@ -734,10 +863,35 @@ window.firebaseReady = (async function () {
       categories = DEFAULT_CATEGORIES.slice();
       storeSet("categories", categories);
     }
+    await hydrateItemImages(items);
     return { items: items, invoices: invoices, counter: counter, categories: categories };
   }
 
+  /* One-time write test so a blocked database is reported loudly instead
+     of silently eating every save. */
+  async function cloudSelfTest() {
+    try {
+      var fb = await window.firebaseReady;
+      if (!fb || !fb.ok) {
+        saveWarning(
+          "Could not reach the cloud database at all — data is only being kept on this device.",
+        );
+        return;
+      }
+      var res = await storeSet("__writeTest", { t: Date.now() });
+      if (!res.ok) {
+        saveWarning(
+          "Cloud database is refusing writes (see console for the exact error). " +
+            "Nothing you save will survive on other devices until this is fixed.",
+        );
+      }
+    } catch (e) {
+      console.error("Cloud self-test failed:", e);
+    }
+  }
+
   async function init(dataPromise) {
+    cloudSelfTest();
     var data = await (dataPromise || fetchAppData());
     state.items = data.items;
     state.invoices = data.invoices;
@@ -846,7 +1000,17 @@ window.firebaseReady = (async function () {
       phone: cust.phone || "",
       address: addressBits,
       lines: (order.lines || []).map(function (l) {
-        return { id: uid(), itemId: l.itemId, qty: l.qty, query: l.name || "" };
+        return {
+          id: uid(),
+          itemId: l.itemId,
+          qty: l.qty,
+          query: l.name || "",
+          // keep the pack price the customer actually saw/selected on the
+          // website, so billing this order doesn't fall back to the item's
+          // single-piece price when it was really a multi-piece pack.
+          price: typeof l.price === "number" ? l.price : undefined,
+          variant: l.variant || "",
+        };
       }),
       sourceOrderId: order.id,
     };
@@ -857,7 +1021,41 @@ window.firebaseReady = (async function () {
   }
 
   async function saveItems() {
-    await storeSet("items", state.items);
+    /* photos first, one document per item, and only the ones that changed */
+    var failed = 0;
+    var tasks = [];
+    state.items.forEach(function (it) {
+      var imgs = (it.images || []).filter(Boolean);
+      var json = JSON.stringify(imgs);
+      if (savedImagesCache[it.id] === json) return;
+      tasks.push(
+        storeSet(imgKey(it.id), imgs).then(function (r) {
+          if (r && r.ok) savedImagesCache[it.id] = json;
+          else failed++;
+        }),
+      );
+    });
+    await Promise.all(tasks);
+
+    /* then the item list itself, without any base64 in it */
+    var stripped = state.items.map(function (it) {
+      var copy = {};
+      for (var k in it) {
+        if (Object.prototype.hasOwnProperty.call(it, k)) copy[k] = it[k];
+      }
+      copy.images = [];
+      copy.img = "";
+      copy.hasPhoto = (it.images || []).filter(Boolean).length > 0;
+      return copy;
+    });
+    var res = await storeSet("items", stripped);
+    if (failed || (res && !res.ok)) {
+      saveWarning(
+        "Photos saved on this device only — the cloud save was rejected. " +
+          "Open the browser console (F12) and check the Firestore error, " +
+          "usually it is the database security rules blocking writes.",
+      );
+    }
   }
   async function saveCategories() {
     await storeSet("categories", state.categories);
@@ -1545,6 +1743,11 @@ window.firebaseReady = (async function () {
         return i.id === value;
       });
       line.query = item ? item.name : "";
+      // manually re-picking the item means any pack price carried over
+      // from a website order no longer applies — fall back to the item's
+      // normal price.
+      delete line.price;
+      delete line.variant;
     }
     if (field === "qty") line.qty = Math.max(0, Number(value) || 0);
     render();
@@ -1640,7 +1843,10 @@ window.firebaseReady = (async function () {
       var item = state.items.find(function (i) {
         return i.id === l.itemId;
       });
-      if (item) total += item.price * l.qty;
+      if (item) {
+        var unitPrice = typeof l.price === "number" ? l.price : item.price;
+        total += unitPrice * l.qty;
+      }
     });
     return total;
   }
@@ -1697,15 +1903,17 @@ window.firebaseReady = (async function () {
         var item = state.items.find(function (i) {
           return i.id === l.itemId;
         });
+        var unitPrice = typeof l.price === "number" ? l.price : item.price;
         return {
           itemId: item.id,
-          name: item.name,
+          name: item.name + (l.variant ? " (" + l.variant + ")" : ""),
           img: item.img,
           color: item.color,
           unit: item.unit,
+          variant: l.variant || "",
           qty: l.qty,
-          price: item.price,
-          amount: item.price * l.qty,
+          price: unitPrice,
+          amount: unitPrice * l.qty,
         };
       });
     var subtotal = lines.reduce(function (s, l) {
@@ -1812,7 +2020,27 @@ window.firebaseReady = (async function () {
       phone: inv.phone || "",
       address: inv.address || "",
       lines: inv.lines.map(function (l) {
-        return { id: uid(), itemId: l.itemId, qty: l.qty, query: l.name || "" };
+        var item = state.items.find(function (i) {
+          return i.id === l.itemId;
+        });
+        // preserve the price this line was actually billed at, so editing
+        // an invoice that had a pack price on it doesn't quietly reset
+        // back to the item's normal single-piece price.
+        var carriedPrice =
+          item && typeof l.price === "number" && l.price !== item.price
+            ? l.price
+            : undefined;
+        return {
+          id: uid(),
+          itemId: l.itemId,
+          qty: l.qty,
+          query: item ? item.name : l.name || "",
+          price: carriedPrice,
+          // carry the pack/variant label forward too, otherwise editing a
+          // pack order and saving again silently drops the "(3 Pc)" style
+          // label from the name and the bill's quantity column.
+          variant: l.variant || "",
+        };
       }),
     };
     state.formErrors = null;
@@ -1997,6 +2225,10 @@ window.firebaseReady = (async function () {
           return (
             "<tr><td>" +
             esc(l.name || "Item") +
+            // show which pack/variant was ordered right here too, so a
+            // pack order (e.g. "3 Pc") is clear before it's even billed —
+            // not just after, on the generated invoice.
+            (l.variant ? ' <span class="muted">(' + esc(l.variant) + ")</span>" : "") +
             (l.preorder
               ? ' <span class="pill" style="background:#f3ece1;color:#8a6a3e;">pre-book · 2–4 wks</span>'
               : "") +
@@ -2372,7 +2604,8 @@ window.firebaseReady = (async function () {
     var item = state.items.find(function (i) {
       return i.id === l.itemId;
     });
-    var amount = item ? item.price * l.qty : 0;
+    var unitPrice = item ? (typeof l.price === "number" ? l.price : item.price) : 0;
+    var amount = item ? unitPrice * l.qty : 0;
     var query = item ? item.name : l.query || "";
     var isActive = state.activeComboLine === l.id;
     var hasExact = state.items.some(function (i) {
@@ -2437,7 +2670,9 @@ window.firebaseReady = (async function () {
       l.id +
       '" data-field="qty">' +
       '<div class="muted" style="text-align:right;">' +
-      (item ? fmtMoney(item.price) + "/" + unitLabel(item.unit) : "—") +
+      (item
+        ? fmtMoney(unitPrice) + "/" + (l.variant || unitLabel(item.unit))
+        : "—") +
       "</div>" +
       '<div class="amt">' +
       fmtMoney(amount) +
@@ -3633,9 +3868,16 @@ window.firebaseReady = (async function () {
           esc(l.name) +
           "</div></td>" +
           '<td class="qty">' +
-          l.qty +
-          " " +
-          unitLabel(l.unit) +
+          // a "pack" order (e.g. someone bought 2 packs of "3 Pc") stores
+          // qty as the number of PACKS, not pieces — showing it against the
+          // item's base stock unit ("2 pc") reads as only 2 pieces were
+          // sold and contradicted the "(3 Pc)" already appended to the
+          // item name, which is exactly what was confusing on the bill.
+          // When a pack/variant label is present, show against that label
+          // instead, e.g. "2 x 3 Pc".
+          (l.variant
+            ? l.qty + " x " + esc(l.variant)
+            : l.qty + " " + unitLabel(l.unit)) +
           "</td>" +
           '<td class="amt">' +
           fmtMoney(l.price) +
